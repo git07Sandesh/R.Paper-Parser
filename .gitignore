@@ -1,0 +1,12 @@
+# Ignore build artifacts
+obj/
+bin/
+
+# VS Code settings
+.vscode/
+
+# macOS files
+.DS_Store
+
+# SQLite DB (optional, if you don’t want to track it)
+*.db3
