@@ -57,13 +57,15 @@ public partial class MainPage : ContentPage
             if (isLoggedIn)
             {
                 DisplayAlert("Success", "Login successful", "OK");
-                // Redirect to next page or dashboard here
+                var user = _databaseHelper.GetUserByEmail(email);  // ✅ call the helper's method
+                Navigation.PushAsync(new DashboardPage(user));     // ✅ pass user to Dashboard
             }
             else
             {
                 DisplayAlert("Error", "Invalid credentials", "OK");
             }
         }
+        
 
 	
 }

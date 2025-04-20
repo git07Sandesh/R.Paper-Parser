@@ -1,6 +1,6 @@
-# Ignore build artifacts
-obj/
-bin/
+**/obj/
+**/bin/
+
 
 # VS Code settings
 .vscode/

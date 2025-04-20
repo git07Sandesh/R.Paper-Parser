@@ -10,6 +10,7 @@ public class DatabaseHelper
         string databasePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "userdata.db3");
         _database = new SQLiteConnection(databasePath);
         _database.CreateTable<User>(); 
+        _database.CreateTable<Summary>();
     }
 
     // Register new user
@@ -33,6 +34,10 @@ public class DatabaseHelper
     
         return true;
     }
+        public User GetUserByEmail(string email)
+    {
+        return _database.Table<User>().FirstOrDefault(u => u.Email == email);
+    }
 
     // Login user
     public bool LoginUser(string email, string password)
@@ -43,6 +48,25 @@ public class DatabaseHelper
 
         return user.Password == password;  // In real apps, hash the password and compare hashes
     }
+    public void SaveSummary(int userId, string fileName, string summaryText)
+    {
+        var summary = new Summary
+        {
+            UserId = userId,
+            FileName = fileName,
+            SummaryText = summaryText,
+            Timestamp = DateTime.Now
+        };
+        _database.Insert(summary);
+    }
+    public List<Summary> GetUserSummaries(int userId, bool isPremium)
+    {
+        var query = _database.Table<Summary>()
+                            .Where(s => s.UserId == userId)
+                            .OrderByDescending(s => s.Timestamp);
+
+        return isPremium ? query.ToList() : query.Take(3).ToList();
+    }
 }
 public class User
 {
@@ -51,4 +75,15 @@ public class User
 
     public string Email { get; set; } = string.Empty;  // Default value
     public string Password { get; set; } = string.Empty;  // Default value
+    public bool IsPremium { get; set; } = true;
+}
+public class Summary
+{
+    [PrimaryKey, AutoIncrement]
+    public int Id { get; set; }
+
+    public int UserId { get; set; }
+    public string FileName { get; set; } = string.Empty;
+    public string SummaryText { get; set; } = string.Empty;
+    public DateTime Timestamp { get; set; }
 }

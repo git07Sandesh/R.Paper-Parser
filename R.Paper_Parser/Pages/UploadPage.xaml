@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="R.Paper_Parser.Pages.UploadPage"
+             Title="Upload Paper">
+
+    <StackLayout Padding="20" Spacing="20">
+        <Label Text="Upload Research Paper" FontSize="24" HorizontalOptions="Center" />
+        <Button Text="Choose File" Clicked="OnPickFileClicked" />
+
+        <Label x:Name="FileLabel" Text="No file selected" HorizontalOptions="Center" FontSize="14"/>
+        <Button Text="Generate Summary" IsEnabled="False" x:Name="GenerateButton" Clicked="OnGenerateSummaryClicked"/>
+    </StackLayout>
+</ContentPage>
