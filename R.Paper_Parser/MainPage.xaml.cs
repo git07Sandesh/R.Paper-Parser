@@ -1,24 +1,25 @@
-﻿
-using System;
+﻿using System;
 using Microsoft.Maui.Controls;
 using System.IO;
+using R.Paper_Parser.database;
+using R.Paper_Parser.Pages;
 
-namespace R.Paper_Parser;
-
-public partial class MainPage : ContentPage
+namespace R.Paper_Parser
 {
-	private DatabaseHelper _databaseHelper;
+    public partial class MainPage : ContentPage
+    {
+        private DatabaseHelper _databaseHelper;
 
         public MainPage()
         {
             InitializeComponent();
             
            string dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "userdata.db3");
-    Console.WriteLine($"Database path: {dbPath}");  // Log the database path to verify
+    Console.WriteLine($"Database path: {dbPath}");  // show db location in console for debugging
     _databaseHelper = new DatabaseHelper(dbPath);
         }
 
-        // Handle Register Button Click
+        // signup func - checks inputs and registers user
         private void OnRegisterClicked(object sender, EventArgs e)
         {
             string email = RegisterEmailEntry.Text;
@@ -41,7 +42,7 @@ public partial class MainPage : ContentPage
             }
         }
 
-        // Handle Login Button Click
+        // login func - checks creds and forwards to dashboard if ok
         private void OnLoginClicked(object sender, EventArgs e)
         {
             string email = LoginEmailEntry.Text;
@@ -57,16 +58,14 @@ public partial class MainPage : ContentPage
             if (isLoggedIn)
             {
                 DisplayAlert("Success", "Login successful", "OK");
-                var user = _databaseHelper.GetUserByEmail(email);  // ✅ call the helper's method
-                Navigation.PushAsync(new DashboardPage(user));     // ✅ pass user to Dashboard
+                var user = _databaseHelper.GetUserByEmail(email);  // get user obj
+                Navigation.PushAsync(new DashboardPage(user));     // pass to dashboard
             }
             else
             {
                 DisplayAlert("Error", "Invalid credentials", "OK");
             }
         }
-        
-
-	
+    }
 }
 

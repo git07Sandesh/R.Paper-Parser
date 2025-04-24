@@ -28,5 +28,109 @@
 	</array>
 	<key>XSAppIconAssets</key>
 	<string>Assets.xcassets/appicon.appiconset</string>
+	
+	<!-- Document Types Declaration - Required for handling PDF and DOCX files -->
+	<key>CFBundleDocumentTypes</key>
+	<array>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>PDF Document</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.adobe.pdf</string>
+				<string>public.pdf</string>
+			</array>
+		</dict>
+		<dict>
+			<key>CFBundleTypeName</key>
+			<string>Microsoft Word Document</string>
+			<key>LSHandlerRank</key>
+			<string>Alternate</string>
+			<key>LSItemContentTypes</key>
+			<array>
+				<string>com.microsoft.word.doc</string>
+				<string>org.openxmlformats.wordprocessingml.document</string>
+			</array>
+		</dict>
+	</array>
+	
+	<!-- UTI imports for file types -->
+	<key>UTImportedTypeDeclarations</key>
+	<array>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+				<string>public.content</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>PDF Document</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.adobe.pdf</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>pdf</string>
+				</array>
+				<key>public.mime-type</key>
+				<array>
+					<string>application/pdf</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+				<string>public.content</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Microsoft Word Document</string>
+			<key>UTTypeIdentifier</key>
+			<string>org.openxmlformats.wordprocessingml.document</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>docx</string>
+				</array>
+				<key>public.mime-type</key>
+				<array>
+					<string>application/vnd.openxmlformats-officedocument.wordprocessingml.document</string>
+				</array>
+			</dict>
+		</dict>
+		<dict>
+			<key>UTTypeConformsTo</key>
+			<array>
+				<string>public.data</string>
+				<string>public.content</string>
+			</array>
+			<key>UTTypeDescription</key>
+			<string>Microsoft Word Document (Legacy)</string>
+			<key>UTTypeIdentifier</key>
+			<string>com.microsoft.word.doc</string>
+			<key>UTTypeTagSpecification</key>
+			<dict>
+				<key>public.filename-extension</key>
+				<array>
+					<string>doc</string>
+				</array>
+				<key>public.mime-type</key>
+				<array>
+					<string>application/msword</string>
+				</array>
+			</dict>
+		</dict>
+	</array>
+	
+	<!-- File picker permissions -->
+	<key>NSDocumentsFolderUsageDescription</key>
+	<string>This app requires access to the Documents folder to select and process research papers.</string>
+	<key>UISupportsDocumentBrowser</key>
+	<true/>
 </dict>
 </plist>
