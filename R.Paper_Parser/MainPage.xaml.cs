@@ -1,5 +1,4 @@
-﻿
-using System;
+﻿using System;
 using Microsoft.Maui.Controls;
 using System.IO;
 
@@ -12,7 +11,7 @@ public partial class MainPage : ContentPage
         public MainPage()
         {
             InitializeComponent();
-            
+
            string dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "userdata.db3");
     Console.WriteLine($"Database path: {dbPath}");  // Log the database path to verify
     _databaseHelper = new DatabaseHelper(dbPath);
@@ -64,9 +63,5 @@ public partial class MainPage : ContentPage
             {
                 DisplayAlert("Error", "Invalid credentials", "OK");
             }
-        }
-        
-
-	
+        }	
 }
-
