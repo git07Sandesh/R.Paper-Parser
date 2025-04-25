@@ -58,9 +58,13 @@ namespace R.Paper_Parser.Pages
             // Updated to use Border instead of Frame (Frame is obsolete in .NET 9)
             if (sender is Border border && border.BindingContext is Summary summary)
             {
-                // For now, all users get the basic summary view
-                // Premium features will be added in Phase 5
-                await Navigation.PushAsync(new SummaryPage(summary.SummaryText, summary.FileName, false));
+                // When viewing from history, we don't have the extracted text anymore
+                // so we pass an empty string for extractedText
+                await Navigation.PushAsync(new SummaryPage(
+                    summary.SummaryText, 
+                    "Original paper content not available in history view.", 
+                    summary.FileName, 
+                    _user.IsPremium));
             }
         }
         

@@ -95,21 +95,45 @@ namespace R.Paper_Parser.Pages
                 FileLabel.Text = "Processing your document...";
 
                 // Generate summary using Gemini API
-                string summary = await _summaryService.GenerateSummary(_pickedFile, _currentUser.IsPremium);
+                SummaryResult result = await _summaryService.GenerateSummary(_pickedFile, _currentUser.IsPremium);
                 
-                // Save summary in database
-                _db.SaveSummary(_currentUser.Id, _pickedFile.FileName, summary);
+                // Even if the API call failed, if we successfully extracted text,
+                // we can still show the paper content to the user
+                if (!result.IsSuccess && string.IsNullOrEmpty(result.ExtractedText))
+                {
+                    // Complete failure - no text extracted and no summary
+                    await DisplayAlert("Error", result.ErrorMessage, "OK");
+                    return;
+                }
+                
+                // If we have extracted text but failed to get a summary, show a warning
+                if (!result.IsSuccess && !string.IsNullOrEmpty(result.ExtractedText))
+                {
+                    await DisplayAlert("Partial Success", 
+                        "The paper content was successfully extracted, but we couldn't generate a summary. " +
+                        "You can still view the paper content.", "Continue");
+                    
+                    // Use the fallback summary from the API service
+                    if (string.IsNullOrEmpty(result.Summary))
+                    {
+                        result.Summary = "Unable to generate a summary. Please view the paper content instead.";
+                    }
+                }
+                
+                // Save whatever summary we have in database
+                _db.SaveSummary(_currentUser.Id, _pickedFile.FileName, result.Summary);
                 
                 // Navigate to summary page with all relevant information
                 await Navigation.PushAsync(new SummaryPage(
-                    summary, 
+                    result.Summary, 
+                    result.ExtractedText,
                     _pickedFile.FileName, 
                     _currentUser.IsPremium
                 ));
             }
             catch (Exception ex)
             {
-                await DisplayAlert("Error", $"Failed to generate summary: {ex.Message}", "OK");
+                await DisplayAlert("Error", $"Failed to process document: {ex.Message}", "OK");
             }
             finally
             {

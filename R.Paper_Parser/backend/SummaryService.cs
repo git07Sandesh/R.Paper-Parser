@@ -8,6 +8,14 @@ using Microsoft.Maui.Storage;
 
 namespace R.Paper_Parser.backend
 {
+    public class SummaryResult
+    {
+        public string ExtractedText { get; set; } = string.Empty;
+        public string Summary { get; set; } = string.Empty;
+        public bool IsSuccess { get; set; }
+        public string ErrorMessage { get; set; } = string.Empty;
+    }
+
     public class SummaryService
     {
         private const string GeminiApiKey = "AIzaSyADtmLNh2p5N-qlqYwDVcH28opFmbD2G2k";
@@ -23,8 +31,10 @@ namespace R.Paper_Parser.backend
             _httpClient = new HttpClient();
         }
         
-        public async Task<string> GenerateSummary(FileResult file, bool isPremium)
+        public async Task<SummaryResult> GenerateSummary(FileResult file, bool isPremium)
         {
+            var result = new SummaryResult();
+            
             try
             {
                 // first get text from file
@@ -36,44 +46,79 @@ namespace R.Paper_Parser.backend
                     fileContent.StartsWith("PDF extraction error:") ||
                     fileContent.StartsWith("DOCX extraction error:"))
                 {
-                    return $"Failed to extract content from the file: {fileContent}";
+                    result.ErrorMessage = $"Failed to extract content from the file: {fileContent}";
+                    result.IsSuccess = false;
+                    return result;
                 }
                 
+                // Store the extracted text in the result
+                result.ExtractedText = fileContent;
+                
                 // trim big docs to avoid API limits
+                string trimmedContent = fileContent;
                 const int maxApiTextLength = 30000; // 15-20 pages max
-                if (fileContent.Length > maxApiTextLength)
+                if (trimmedContent.Length > maxApiTextLength)
                 {
-                    fileContent = fileContent.Substring(0, maxApiTextLength) + 
+                    trimmedContent = trimmedContent.Substring(0, maxApiTextLength) + 
                         "\n\n[Content trimmed due to size limits. Summary covers first part of document.]";
                 }
                 
                 // make sure content is meaningful
-                string trimmedContent = fileContent.Trim();
-                if (trimmedContent.Length < 50) // too small for real paper
+                if (trimmedContent.Trim().Length < 50) // too small for real paper
                 {
-                    return "Text is too short or empty. Could be document protection, scanned content, or format issues. Try another document.";
+                    result.ErrorMessage = "Text is too short or empty. Could be document protection, scanned content, or format issues. Try another document.";
+                    result.IsSuccess = false;
+                    return result;
                 }
                 
                 Console.WriteLine($"Got {trimmedContent.Length} chars from {file.FileName}");
                 
                 // build prompt with file content
-                string prompt = CreatePrompt(fileContent);
+                string prompt = CreatePrompt(trimmedContent);
                 
                 // call Gemini API
-                var summary = await CallGeminiApi(prompt);
-                return summary;
+                string summary = await CallGeminiApi(prompt);
+                
+                result.Summary = summary;
+                
+                // Check for common error patterns or generic responses
+                bool hasError = summary.StartsWith("API Error:") || 
+                                summary.StartsWith("Failed to parse") ||
+                                summary.Contains("Please provide the research paper content") ||
+                                summary.Contains("I need the text of the paper");
+                                
+                result.IsSuccess = !hasError;
+                
+                if (!result.IsSuccess && string.IsNullOrEmpty(result.ErrorMessage))
+                {
+                    result.ErrorMessage = "Unable to generate a proper summary from the provided content.";
+                }
+                
+                return result;
             }
             catch (Exception ex)
             {
                 Console.WriteLine($"Summary generation error: {ex}");
-                return $"Error generating summary: {ex.Message}";
+                result.ErrorMessage = $"Error generating summary: {ex.Message}";
+                result.IsSuccess = false;
+                return result;
             }
         }
         
         private string CreatePrompt(string fileContent)
         {
-            return $"Please provide a concise summary of the following research paper that highlights the key methodology and results:\n\n" +
-                   "Research paper content:\n{fileContent}";
+            // Create a more specific prompt with clearer instructions
+            return @"You are a research paper summarization assistant. Analyze and summarize the following research paper.
+Focus specifically on:
+1. The main research question or objective
+2. The methodology used
+3. Key findings and results
+4. Important conclusions
+
+Provide a concise but comprehensive summary that captures these key elements.
+Here is the paper content:
+
+" + fileContent;
         }
         
         private async Task<string> CallGeminiApi(string prompt)
@@ -84,7 +129,7 @@ namespace R.Paper_Parser.backend
                 string apiUrlWithKey = $"{GeminiApiUrl}?key={GeminiApiKey}";
                 Console.WriteLine($"Calling Gemini API at: {GeminiApiUrl}");
                 
-                // create request body - format from API docs
+                // create request body with more specific safety settings and configuration
                 var requestBody = new
                 {
                     contents = new[]
@@ -102,8 +147,18 @@ namespace R.Paper_Parser.backend
                     },
                     generationConfig = new
                     {
-                        temperature = 0.2,
-                        maxOutputTokens = 2048
+                        temperature = 0.1, // Lower temperature for more focused responses
+                        maxOutputTokens = 2048,
+                        topK = 40,
+                        topP = 0.95
+                    },
+                    safetySettings = new[]
+                    {
+                        new
+                        {
+                            category = "HARM_CATEGORY_DANGEROUS_CONTENT",
+                            threshold = "BLOCK_NONE"
+                        }
                     }
                 };
                 
@@ -112,7 +167,10 @@ namespace R.Paper_Parser.backend
                 
                 if (response.IsSuccessStatusCode)
                 {
-                    var jsonResponse = await response.Content.ReadFromJsonAsync<JsonElement>();
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"API Response: {responseContent.Substring(0, Math.Min(responseContent.Length, 200))}...");
+                    
+                    var jsonResponse = JsonDocument.Parse(responseContent).RootElement;
                     
                     // parse response to get summary
                     try
@@ -124,10 +182,20 @@ namespace R.Paper_Parser.backend
                         var firstPart = parts[0];
                         var text = firstPart.GetProperty("text").GetString();
                         
+                        // Check if the response is the generic "Please provide" message
+                        if (string.IsNullOrEmpty(text) || 
+                            text.Contains("Please provide the research paper content") ||
+                            text.Contains("I need the text of the paper"))
+                        {
+                            Console.WriteLine("Received generic response from API. Trying alternative endpoint.");
+                            return await TryAlternativeApiEndpoint(prompt);
+                        }
+                        
                         return text ?? "No text returned from API";
                     }
                     catch (Exception ex)
                     {
+                        Console.WriteLine($"Failed to parse API response: {ex.Message}");
                         return $"Failed to parse API response: {ex.Message}";
                     }
                 }
@@ -137,7 +205,9 @@ namespace R.Paper_Parser.backend
                     Console.WriteLine($"Gemini API Error: {response.StatusCode} - {errorResponse}");
                     
                     // try backup API if first fails
-                    if (response.StatusCode == System.Net.HttpStatusCode.NotFound)
+                    if (response.StatusCode == System.Net.HttpStatusCode.NotFound || 
+                        response.StatusCode == System.Net.HttpStatusCode.BadRequest ||
+                        errorResponse.Contains("safety"))
                     {
                         Console.WriteLine("Trying backup API endpoint...");
                         return await TryAlternativeApiEndpoint(prompt);
@@ -160,8 +230,9 @@ namespace R.Paper_Parser.backend
                 // backup API with different model
                 string alternativeUrl = "https://generativelanguage.googleapis.com/v1/models/gemini-1.5-flash:generateContent";
                 string apiUrlWithKey = $"{alternativeUrl}?key={GeminiApiKey}";
+                Console.WriteLine($"Calling alternate API at: {alternativeUrl}");
                 
-                // create request body
+                // Using the same improved request body structure as the primary endpoint
                 var requestBody = new
                 {
                     contents = new[]
@@ -179,8 +250,18 @@ namespace R.Paper_Parser.backend
                     },
                     generationConfig = new
                     {
-                        temperature = 0.2,
-                        maxOutputTokens = 2048
+                        temperature = 0.1,
+                        maxOutputTokens = 2048,
+                        topK = 40,
+                        topP = 0.95
+                    },
+                    safetySettings = new[]
+                    {
+                        new
+                        {
+                            category = "HARM_CATEGORY_DANGEROUS_CONTENT",
+                            threshold = "BLOCK_NONE"
+                        }
                     }
                 };
                 
@@ -188,7 +269,10 @@ namespace R.Paper_Parser.backend
                 
                 if (response.IsSuccessStatusCode)
                 {
-                    var jsonResponse = await response.Content.ReadFromJsonAsync<JsonElement>();
+                    var responseContent = await response.Content.ReadAsStringAsync();
+                    Console.WriteLine($"Alternate API Response: {responseContent.Substring(0, Math.Min(responseContent.Length, 200))}...");
+                    
+                    var jsonResponse = JsonDocument.Parse(responseContent).RootElement;
                     
                     // parse response to get summary
                     try
@@ -200,23 +284,50 @@ namespace R.Paper_Parser.backend
                         var firstPart = parts[0];
                         var text = firstPart.GetProperty("text").GetString();
                         
-                        return text ?? "No text returned from backup API";
+                        // Check if the response is the generic "Please provide" message
+                        if (string.IsNullOrEmpty(text) || 
+                            text.Contains("Please provide the research paper content") ||
+                            text.Contains("I need the text of the paper"))
+                        {
+                            // If even our backup API is returning generic responses,
+                            // create a fallback summary that at least gives some information
+                            Console.WriteLine("Received generic response from alternate API too. Falling back to basic summary.");
+                            return CreateFallbackSummary();
+                        }
+                        
+                        return text ?? "No text returned from alternate API";
                     }
                     catch (Exception ex)
                     {
-                        return $"Failed to parse API response: {ex.Message}";
+                        Console.WriteLine($"Failed to parse alternate API response: {ex.Message}");
+                        return CreateFallbackSummary();
                     }
                 }
                 else
                 {
                     var errorResponse = await response.Content.ReadAsStringAsync();
-                    return $"Backup API Error: {response.StatusCode} - {errorResponse}";
+                    Console.WriteLine($"Alternate API Error: {response.StatusCode} - {errorResponse}");
+                    return CreateFallbackSummary();
                 }
             }
             catch (Exception ex)
             {
-                return $"Error with backup API: {ex.Message}";
+                Console.WriteLine($"Exception calling alternate API: {ex.Message}");
+                return CreateFallbackSummary();
             }
+        }
+        
+        private string CreateFallbackSummary()
+        {
+            // Provide a useful message when both APIs fail
+            return "Unable to generate an automatic summary at this time. " +
+                   "The paper has been successfully processed and its content is available " +
+                   "in the 'Paper Content' tab. You can read the original text there.\n\n" +
+                   "Possible reasons for this issue:\n" +
+                   "- The API service may be temporarily unavailable\n" +
+                   "- The paper format may not be compatible with our summarization tool\n" +
+                   "- The content may be too specialized for automatic summarization\n\n" +
+                   "Please try again later or with a different document.";
         }
     }
 }
