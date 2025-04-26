@@ -1,8 +1,112 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="R.Paper_Parser.Pages.SignupPage">
-    <StackLayout>
-        <Label Text="SignUp Page (Placeholder)" />
-    </StackLayout>
+             x:Class="R.Paper_Parser.Pages.SignupPage"
+             BackgroundColor="White">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="25" VerticalOptions="Center">
+
+            <!-- Title -->
+            <Label Text="Create Account"
+                   FontSize="28"
+                   FontAttributes="Bold"
+                   HorizontalOptions="Center"
+                   TextColor="Black" />
+
+            <!-- Subtitle -->
+            <Label Text="Fill your information below"
+                   FontSize="16"
+                   TextColor="Gray"
+                   HorizontalOptions="Center" />
+
+            <!-- Name (you can leave this for now) -->
+            <Label Text="Name"
+                   FontSize="14"
+                   TextColor="DarkBlue" />
+            <Border StrokeThickness="0"
+                    BackgroundColor="#153B9F"
+                    StrokeShape="RoundRectangle 10"
+                    HeightRequest="50">
+                <Entry Placeholder="Ex. John Doe"
+                       BackgroundColor="Transparent"
+                       TextColor="White"
+                       PlaceholderColor="LightGray"
+                       Margin="10,0" />
+            </Border>
+
+            <!-- Email (important: x:Name="RegisterEmailEntry") -->
+            <Label Text="Email"
+                   FontSize="14"
+                   TextColor="DarkBlue" />
+            <Border StrokeThickness="0"
+                    BackgroundColor="#153B9F"
+                    StrokeShape="RoundRectangle 10"
+                    HeightRequest="50">
+                <Entry x:Name="RegisterEmailEntry"
+                       Placeholder="example@gmail.com"
+                       BackgroundColor="Transparent"
+                       TextColor="White"
+                       PlaceholderColor="LightGray"
+                       Keyboard="Email"
+                       Margin="10,0" />
+            </Border>
+
+            <!-- Password -->
+            <Label Text="Password"
+                   FontSize="14"
+                   TextColor="DarkBlue" />
+            <Border StrokeThickness="0"
+                    BackgroundColor="#153B9F"
+                    StrokeShape="RoundRectangle 10"
+                    HeightRequest="50">
+                <Grid>
+                    <Entry x:Name="PasswordEntry"
+                           IsPassword="True"
+                           Placeholder="************"
+                           BackgroundColor="Transparent"
+                           TextColor="White"
+                           PlaceholderColor="LightGray"
+                           Margin="10,0" />
+                    <ImageButton Source="eye.png"
+                                 BackgroundColor="Transparent"
+                                 WidthRequest="30"
+                                 HeightRequest="30"
+                                 HorizontalOptions="End"
+                                 VerticalOptions="Center"
+                                 Clicked="OnTogglePasswordVisibility" />
+                </Grid>
+            </Border>
+
+            <!-- Create Account Button -->
+            <Button Text="CREATE ACCOUNT"
+                    FontSize="18"
+                    TextColor="White"
+                    BackgroundColor="#C5543B"
+                    CornerRadius="10"
+                    HeightRequest="55"
+                    Clicked="OnCreateAccountClicked" />
+
+            <!-- Sign In link -->
+            <HorizontalStackLayout HorizontalOptions="Center">
+                <Label Text="Already have an account?"
+                       FontSize="14"
+                       TextColor="Black" />
+                <Label Text=" Sign in"
+                       FontSize="14"
+                       TextColor="Red">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnSignInTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+
+            <!-- Logo -->
+            <Image Source="reparserimg.png"
+                   HeightRequest="80"
+                   HorizontalOptions="Center"
+                   Margin="0,20,0,0" />
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

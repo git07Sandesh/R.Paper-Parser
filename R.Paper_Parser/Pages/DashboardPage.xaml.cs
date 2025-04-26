@@ -1,42 +1,46 @@
 using Microsoft.Maui.Controls;
-using R.Paper_Parser.Pages;
 using R.Paper_Parser.database;
 using System.IO;
 using System;
-namespace R.Paper_Parser;
+using System.Threading.Tasks;
 
-public partial class DashboardPage : ContentPage
+namespace R.Paper_Parser.Pages
 {
-    private User _currentUser;
-    private DatabaseHelper _db;
-
-    public DashboardPage(User user)
+    public partial class DashboardPage : ContentPage
     {
-        InitializeComponent();
-        _currentUser = user;
-        string dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "userdata.db3");
-        _db = new DatabaseHelper(dbPath);
-    }
+        private User _currentUser;
+        private DatabaseHelper _db;
 
-    private async void OnUploadClicked(object sender, EventArgs e)
-    {
-        await Navigation.PushAsync(new UploadPage(_currentUser));
-    }
+        public DashboardPage(User user)
+        {
+            InitializeComponent();
+            _currentUser = user;
 
-    private async void OnHistoryClicked(object sender, EventArgs e)
-    {
-        // TODO: Navigate to Summary History Page
-        await Navigation.PushAsync(new HistoryPage(_currentUser));
-    }
+            string dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "userdata.db3");
+            _db = new DatabaseHelper(dbPath);
+        }
 
-    private void OnUpgradeClicked(object sender, EventArgs e)
-    {
-        // TODO: Navigate to Premium Subscription Page
-        DisplayAlert("Coming Soon", "Premium upgrade functionality will be added in Phase 5.", "OK");
-    }
+        private async void OnUploadClicked(object sender, EventArgs e)
+        {
+            // Option 1: if you want to pass user object directly
+            await Shell.Current.GoToAsync("upload");
+            // (we will later show how to pass parameters properly if needed)
+        }
 
-    private async void OnLogoutClicked(object sender, EventArgs e)
-    {
-        await Navigation.PopToRootAsync();
+        private async void OnHistoryClicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("history");
+        }
+
+        private async void OnUpgradeClicked(object sender, EventArgs e)
+        {
+            await Shell.Current.GoToAsync("subscription");
+        }
+
+        private async void OnLogoutClicked(object sender, EventArgs e)
+        {
+            // Send the user back to login page when logout
+            await Shell.Current.GoToAsync("//login");
+        }
     }
 }

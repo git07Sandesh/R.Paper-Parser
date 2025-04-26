@@ -1,15 +1,87 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="R.Paper_Parser.DashboardPage"
-             Title="Dashboard">
+             x:Class="R.Paper_Parser.Pages.DashboardPage"
+             BackgroundColor="White">
 
-    <StackLayout Padding="20" Spacing="20">
-        <Label Text="Welcome to your Dashboard!" FontSize="24" HorizontalOptions="Center" />
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="25">
 
-        <Button Text="Upload Research Paper" Clicked="OnUploadClicked"/>
-        <Button Text="View My Summaries" Clicked="OnHistoryClicked"/>
-        <Button Text="Upgrade to Premium" Clicked="OnUpgradeClicked"/>
-        <Button Text="Logout" Clicked="OnLogoutClicked"/>
-    </StackLayout>
+            <!-- Top Row: Sign Out + Plan Info -->
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="*" />
+                </Grid.ColumnDefinitions>
+
+                <Button Text="SIGN OUT"
+                        Grid.Column="0"
+                        BackgroundColor="#153B9F"
+                        TextColor="White"
+                        Clicked="OnLogoutClicked"
+                        HeightRequest="35"
+                        WidthRequest="100"
+                        HorizontalOptions="Start" />
+
+                <Label Text="Plan: Basic&#10;5 Credits"
+                       Grid.Column="1"
+                       FontSize="14"
+                       HorizontalTextAlignment="End"
+                       TextColor="Black"
+                       VerticalTextAlignment="Center"
+                       HorizontalOptions="End" />
+            </Grid>
+
+            <!-- Welcome -->
+            <Label Text="Welcome [Name]"
+                   FontSize="28"
+                   HorizontalOptions="Center"
+                   FontFamily="Courier New"
+                   TextColor="Black"
+                   FontAttributes="Bold" />
+
+            <Label Text="What do you want to parse today!"
+                   FontSize="16"
+                   TextColor="Gray"
+                   HorizontalOptions="Center" />
+
+            <!-- Upload Button -->
+            <Button Text="Upload a file ⬆️"
+                    FontSize="20"
+                    BackgroundColor="#153B9F"
+                    TextColor="White"
+                    HeightRequest="65"
+                    CornerRadius="10"
+                    Clicked="OnUploadClicked" />
+
+            <Label Text="(10 MB Max)"
+                   FontSize="12"
+                   TextColor="Gray"
+                   HorizontalOptions="Center" />
+
+            <!-- Generate Summary -->
+            <Button Text="Generate Summary"
+                    FontSize="16"
+                    BackgroundColor="#153B9F"
+                    TextColor="White"
+                    HeightRequest="50"
+                    CornerRadius="10"
+                    Clicked="OnHistoryClicked" />
+
+            <!-- Logo -->
+            <Image Source="reparserimg.png"
+                   HeightRequest="100"
+                   HorizontalOptions="Center" />
+
+            <!-- Try Premium -->
+            <Button Text="Try Premium!"
+                    FontSize="14"
+                    BackgroundColor="#C5543B"
+                    TextColor="White"
+                    CornerRadius="10"
+                    HeightRequest="40"
+                    Clicked="OnUpgradeClicked" />
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

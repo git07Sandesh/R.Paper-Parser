@@ -1,8 +1,101 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
-             x:Class="R.Paper_Parser.Pages.LoginPage">
-    <StackLayout>
-        <Label Text="Login Page (Placeholder)" />
-    </StackLayout>
+             x:Class="R.Paper_Parser.Pages.LoginPage"
+             BackgroundColor="White">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="25" VerticalOptions="Center">
+
+            <!-- Logo -->
+            <Image Source="reparserimg.png"
+                   HeightRequest="120"
+                   HorizontalOptions="Center" />
+
+            <!-- Greeting -->
+            <Label Text="Hello Scientist, you have been missed"
+                   FontSize="18"
+                   HorizontalOptions="Center"
+                   HorizontalTextAlignment="Center"
+                   FontFamily="Courier New"
+                   TextColor="Black" />
+
+            <!-- Email (important: x:Name="LoginEmailEntry") -->
+            <Label Text="Email"
+                   FontSize="14"
+                   TextColor="DarkBlue" />
+            <Border StrokeThickness="0"
+                    BackgroundColor="#153B9F"
+                    StrokeShape="RoundRectangle 10"
+                    HeightRequest="50">
+                <Entry x:Name="LoginEmailEntry"
+                       Placeholder="example@gmail.com"
+                       BackgroundColor="Transparent"
+                       TextColor="White"
+                       PlaceholderColor="LightGray"
+                       Keyboard="Email"
+                       Margin="10,0" />
+            </Border>
+
+            <!-- Password -->
+            <Label Text="Password"
+                   FontSize="14"
+                   TextColor="DarkBlue" />
+            <Border StrokeThickness="0"
+                    BackgroundColor="#153B9F"
+                    StrokeShape="RoundRectangle 10"
+                    HeightRequest="50">
+                <Grid>
+                    <Entry x:Name="PasswordEntry"
+                           IsPassword="True"
+                           Placeholder="************"
+                           BackgroundColor="Transparent"
+                           TextColor="White"
+                           PlaceholderColor="LightGray"
+                           Margin="10,0" />
+                    <ImageButton Source="eye.png"
+                                 BackgroundColor="Transparent"
+                                 WidthRequest="30"
+                                 HeightRequest="30"
+                                 HorizontalOptions="End"
+                                 VerticalOptions="Center"
+                                 Clicked="OnTogglePasswordVisibility" />
+                </Grid>
+            </Border>
+
+            <!-- Forgot Password -->
+            <Label Text="Forgot Password?"
+                   HorizontalOptions="End"
+                   TextColor="DarkBlue"
+                   FontSize="14">
+                <Label.GestureRecognizers>
+                    <TapGestureRecognizer Tapped="OnForgotPasswordTapped" />
+                </Label.GestureRecognizers>
+            </Label>
+
+            <!-- Sign In Button -->
+            <Button Text="SIGN IN"
+                    FontSize="18"
+                    TextColor="White"
+                    BackgroundColor="#C5543B"
+                    CornerRadius="10"
+                    HeightRequest="55"
+                    Clicked="OnSignInClicked" />
+
+            <!-- Sign Up link -->
+            <HorizontalStackLayout HorizontalOptions="Center">
+                <Label Text="Don’t have an account?"
+                       FontSize="14"
+                       TextColor="Black" />
+                <Label Text=" Sign up"
+                       FontSize="14"
+                       TextColor="Red">
+                    <Label.GestureRecognizers>
+                        <TapGestureRecognizer Tapped="OnSignUpTapped" />
+                    </Label.GestureRecognizers>
+                </Label>
+            </HorizontalStackLayout>
+
+        </VerticalStackLayout>
+    </ScrollView>
 </ContentPage>

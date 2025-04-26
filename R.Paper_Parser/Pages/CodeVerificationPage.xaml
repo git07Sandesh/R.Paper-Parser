@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+             xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             x:Class="R.Paper_Parser.Pages.CodeVerificationPage"
+             BackgroundColor="White">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="25" VerticalOptions="Center">
+
+            <!-- Title -->
+            <Label Text="Write Code"
+                   FontSize="24"
+                   HorizontalOptions="Center"
+                   TextColor="Black"
+                   FontAttributes="Bold" />
+
+            <!-- 4-digit Code Entry (could be replaced with 4 individual Entries later) -->
+            <Entry x:Name="VerificationCodeEntry"
+                   MaxLength="6"
+                   Keyboard="Numeric"
+                   FontSize="24"
+                   HorizontalTextAlignment="Center"
+                   BackgroundColor="Transparent"
+                   Placeholder="____"
+                   PlaceholderColor="LightGray"
+                   TextColor="Black"
+                   Margin="0,10" />
+
+            <!-- Change Password Button -->
+            <Button Text="CHANGE PASSWORD"
+                    FontSize="18"
+                    TextColor="White"
+                    BackgroundColor="#C5543B"
+                    CornerRadius="10"
+                    HeightRequest="55"
+                    Clicked="OnChangePasswordClicked" />
+
+            <!-- Logo -->
+            <Image Source="reparserimg.png"
+                   HeightRequest="80"
+                   HorizontalOptions="Center"
+                   Margin="0,20,0,0" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>

@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="utf-8" ?>
+<ContentPage
+    xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
+    xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+    x:Class="R.Paper_Parser.Pages.LandingPage"
+    BackgroundColor="White">
+
+    <ScrollView>
+        <VerticalStackLayout Padding="30" Spacing="25" VerticalOptions="Center">
+
+            <!-- Logo -->
+            <Image Source="reparserimg.png" HeightRequest="100" HorizontalOptions="Center" />
+
+            <!-- Sign In Button -->
+            <Button Text="SIGN IN" BackgroundColor="#153B9F" TextColor="White"
+                    CornerRadius="10" HeightRequest="55" Clicked="OnSignInClicked" />
+
+            <!-- Create Account Button -->
+            <Button Text="CREATE ACCOUNT" BackgroundColor="#153B9F" TextColor="White"
+                    CornerRadius="10" HeightRequest="55" Clicked="OnCreateAccountClicked" />
+
+            <!-- Go Premium Button -->
+            <Button Text="GO PREMIUM" BackgroundColor="#C5543B" TextColor="White"
+                    CornerRadius="10" HeightRequest="55" Clicked="OnGoPremiumClicked" />
+
+        </VerticalStackLayout>
+    </ScrollView>
+</ContentPage>
