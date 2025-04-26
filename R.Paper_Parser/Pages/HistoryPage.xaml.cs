@@ -6,24 +6,38 @@ using R.Paper_Parser.backend;
 
 namespace R.Paper_Parser.Pages
 {
+    [QueryProperty(nameof(UserId), "UserId")]
     public partial class HistoryPage : ContentPage
     {
-        private User _user;
+        private User? _user;
         private HistoryService _historyService;
-        private List<Summary> _summaries = new List<Summary>(); // Initialize with empty list
+        private List<Summary> _summaries = new List<Summary>();
 
-        public HistoryPage(User user)
+        public HistoryPage()
         {
             InitializeComponent();
-            _user = user;
             string dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "userdata.db3");
             _historyService = new HistoryService(dbPath);
 
-            // Premium features will be implemented in Phase 5
-            // Hide premium UI elements for now
             SearchLayout.IsVisible = false;
             BasicUserLabel.IsVisible = false;
+            EmptyStateLabel.IsVisible = true;
+        }
 
+        public string UserId
+        {
+            set
+            {
+                if (int.TryParse(value, out int id))
+                {
+                    LoadUserAndHistory(id);
+                }
+            }
+        }
+
+        private void LoadUserAndHistory(int id)
+        {
+            _user = _historyService.GetUser(id);
             LoadHistory();
         }
 
@@ -31,11 +45,14 @@ namespace R.Paper_Parser.Pages
         {
             try
             {
-                // isPremium parameter will be relevant in Phase 5
+                if (_user == null)
+                {
+                    EmptyStateLabel.IsVisible = true;
+                    return;
+                }
+
                 _summaries = _historyService.GetUserSummaryHistory(_user.Id, _user.IsPremium);
                 HistoryList.ItemsSource = _summaries;
-                
-                // Display message if no summaries found
                 EmptyStateLabel.IsVisible = _summaries.Count == 0;
             }
             catch (Exception ex)
@@ -44,22 +61,27 @@ namespace R.Paper_Parser.Pages
             }
         }
         
-        // Search functionality (will be expanded in Phase 5 with premium features)
         public void SearchSummaries(string searchTerm)
         {
+            if (_user == null)
+            {
+                return;
+            }
+            
             _summaries = _historyService.SearchSummaries(_user.Id, searchTerm, _user.IsPremium);
             HistoryList.ItemsSource = _summaries;
             EmptyStateLabel.IsVisible = _summaries.Count == 0;
         }
         
-        // Handle item tapped to view full summary
         private async void OnSummaryTapped(object sender, EventArgs e)
         {
-            // Updated to use Border instead of Frame (Frame is obsolete in .NET 9)
+            if (_user == null)
+            {
+                return;
+            }
+
             if (sender is Border border && border.BindingContext is Summary summary)
             {
-                // When viewing from history, we don't have the extracted text anymore
-                // so we pass an empty string for extractedText
                 await Navigation.PushAsync(new SummaryPage(
                     summary.SummaryText, 
                     "Original paper content not available in history view.", 
@@ -68,7 +90,6 @@ namespace R.Paper_Parser.Pages
             }
         }
         
-        // Handle search button click - will be used in Phase 5 with premium features
         private void OnSearchClicked(object sender, EventArgs e)
         {
             string searchTerm = SearchEntry.Text?.Trim() ?? string.Empty;

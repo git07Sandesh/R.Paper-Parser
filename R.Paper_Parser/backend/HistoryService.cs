@@ -31,5 +31,11 @@ namespace R.Paper_Parser.backend
         {
             return _dbHelper.SearchSummaries(userId, searchTerm, isPremium);
         }
+
+        // Get user by ID
+        public User GetUser(int userId)
+        {
+            return _dbHelper.GetUserById(userId);
+        }
     }
 }

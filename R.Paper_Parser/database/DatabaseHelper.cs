@@ -46,14 +46,23 @@ namespace R.Paper_Parser.database
             return _database.Table<User>().FirstOrDefault(u => u.Email == email);
         }
 
+        // Get user by ID
+        public User GetUserById(int id)
+        {
+            return _database.Table<User>().FirstOrDefault(u => u.Id == id);
+        }
+
         // Login user
-        public bool LoginUser(string email, string password)
+        public User LoginUser(string email, string password)
         {
             var user = _database.Table<User>().FirstOrDefault(u => u.Email == email);
             if (user == null)
-                return false;  // User doesn't exist
+                return null;  // User doesn't exist
 
-            return user.Password == password;  // In real apps, hash the password and compare hashes
+            if (user.Password == password)  // In real apps, hash the password and compare hashes
+                return user;
+            else
+                return null;
         }
         
         public void SaveSummary(int userId, string fileName, string summaryText)
