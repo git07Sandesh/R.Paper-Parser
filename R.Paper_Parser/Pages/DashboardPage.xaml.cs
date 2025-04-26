@@ -1,5 +1,8 @@
 using Microsoft.Maui.Controls;
 using R.Paper_Parser.Pages;
+using R.Paper_Parser.database;
+using System.IO;
+using System;
 namespace R.Paper_Parser;
 
 public partial class DashboardPage : ContentPage

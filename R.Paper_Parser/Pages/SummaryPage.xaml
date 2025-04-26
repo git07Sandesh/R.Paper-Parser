@@ -3,10 +3,46 @@
              x:Class="R.Paper_Parser.Pages.SummaryPage"
              Title="Summary">
 
-    <ScrollView>
-        <StackLayout Padding="20">
-            <Label Text="Generated Summary" FontSize="24" HorizontalOptions="Center"/>
-            <Label x:Name="SummaryLabel" FontSize="16" LineBreakMode="WordWrap"/>
+    <Grid RowDefinitions="Auto,Auto,*,Auto" Padding="20">
+        <!-- Header -->
+        <StackLayout Grid.Row="0" Spacing="10">
+            <Label Text="Research Paper Analysis" FontSize="24" HorizontalOptions="Center"/>
+            <Label x:Name="FileNameLabel" FontSize="16" HorizontalOptions="Center" TextColor="Gray"/>
         </StackLayout>
-    </ScrollView>
+        
+        <!-- Tab selection -->
+        <Grid Grid.Row="1" ColumnDefinitions="*,*" Margin="0,10,0,0">
+            <Button x:Name="SummaryTabButton" Text="Summary" 
+                    BackgroundColor="#512BD4" TextColor="White"
+                    Grid.Column="0" Clicked="OnSummaryTabClicked"
+                    CornerRadius="5" Margin="0,0,5,0"/>
+            
+            <Button x:Name="FullTextTabButton" Text="Paper Content" 
+                    BackgroundColor="#7744E7" TextColor="White"
+                    Grid.Column="1" Clicked="OnFullTextTabClicked"
+                    CornerRadius="5" Margin="5,0,0,0"/>
+        </Grid>
+        
+        <!-- Main content -->
+        <ScrollView Grid.Row="2" Margin="0,10,0,10">
+            <Grid>
+                <!-- Summary View -->
+                <Border x:Name="SummaryView" Stroke="LightGray" StrokeThickness="1" Padding="15" StrokeShape="RoundRectangle 10" IsVisible="true">
+                    <Label x:Name="SummaryLabel" FontSize="16" LineBreakMode="WordWrap"/>
+                </Border>
+                
+                <!-- Full Text View -->
+                <Border x:Name="FullTextView" Stroke="LightGray" StrokeThickness="1" Padding="15" StrokeShape="RoundRectangle 10" IsVisible="false">
+                    <Label x:Name="FullTextLabel" FontSize="14" LineBreakMode="WordWrap"/>
+                </Border>
+            </Grid>
+        </ScrollView>
+        
+        <!-- Footer with action buttons -->
+        <HorizontalStackLayout Grid.Row="3" Spacing="10" HorizontalOptions="Center">
+            <Button Text="Share" Clicked="OnShareClicked" WidthRequest="100"/>
+            <Button Text="Copy" Clicked="OnCopyClicked" WidthRequest="100"/>
+            <Button Text="Save as PDF" Clicked="OnSaveAsPdfClicked" WidthRequest="120" IsEnabled="{Binding IsPremium}"/>
+        </HorizontalStackLayout>
+    </Grid>
 </ContentPage>

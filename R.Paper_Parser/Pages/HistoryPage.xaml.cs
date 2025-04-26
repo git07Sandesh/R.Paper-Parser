@@ -1,23 +1,78 @@
-namespace R.Paper_Parser.Pages;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using R.Paper_Parser.database;
+using R.Paper_Parser.backend;
 
-public partial class HistoryPage : ContentPage
+namespace R.Paper_Parser.Pages
 {
-    private User _user;
-    private DatabaseHelper _db;
-
-    public HistoryPage(User user)
+    public partial class HistoryPage : ContentPage
     {
-        InitializeComponent();
-        _user = user;
-        string dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "userdata.db3");
-        _db = new DatabaseHelper(dbPath);
+        private User _user;
+        private HistoryService _historyService;
+        private List<Summary> _summaries = new List<Summary>(); // Initialize with empty list
 
-        LoadHistory();
-    }
+        public HistoryPage(User user)
+        {
+            InitializeComponent();
+            _user = user;
+            string dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "userdata.db3");
+            _historyService = new HistoryService(dbPath);
 
-    private void LoadHistory()
-    {
-        var summaries = _db.GetUserSummaries(_user.Id, _user.IsPremium);
-        HistoryList.ItemsSource = summaries;
+            // Premium features will be implemented in Phase 5
+            // Hide premium UI elements for now
+            SearchLayout.IsVisible = false;
+            BasicUserLabel.IsVisible = false;
+
+            LoadHistory();
+        }
+
+        private void LoadHistory()
+        {
+            try
+            {
+                // isPremium parameter will be relevant in Phase 5
+                _summaries = _historyService.GetUserSummaryHistory(_user.Id, _user.IsPremium);
+                HistoryList.ItemsSource = _summaries;
+                
+                // Display message if no summaries found
+                EmptyStateLabel.IsVisible = _summaries.Count == 0;
+            }
+            catch (Exception ex)
+            {
+                DisplayAlert("Error", $"Failed to load history: {ex.Message}", "OK");
+            }
+        }
+        
+        // Search functionality (will be expanded in Phase 5 with premium features)
+        public void SearchSummaries(string searchTerm)
+        {
+            _summaries = _historyService.SearchSummaries(_user.Id, searchTerm, _user.IsPremium);
+            HistoryList.ItemsSource = _summaries;
+            EmptyStateLabel.IsVisible = _summaries.Count == 0;
+        }
+        
+        // Handle item tapped to view full summary
+        private async void OnSummaryTapped(object sender, EventArgs e)
+        {
+            // Updated to use Border instead of Frame (Frame is obsolete in .NET 9)
+            if (sender is Border border && border.BindingContext is Summary summary)
+            {
+                // When viewing from history, we don't have the extracted text anymore
+                // so we pass an empty string for extractedText
+                await Navigation.PushAsync(new SummaryPage(
+                    summary.SummaryText, 
+                    "Original paper content not available in history view.", 
+                    summary.FileName, 
+                    _user.IsPremium));
+            }
+        }
+        
+        // Handle search button click - will be used in Phase 5 with premium features
+        private void OnSearchClicked(object sender, EventArgs e)
+        {
+            string searchTerm = SearchEntry.Text?.Trim() ?? string.Empty;
+            SearchSummaries(searchTerm);
+        }
     }
 }

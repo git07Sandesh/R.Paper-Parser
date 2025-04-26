@@ -1,24 +1,45 @@
 <ContentPage xmlns="http://schemas.microsoft.com/dotnet/2021/maui"
              xmlns:x="http://schemas.microsoft.com/winfx/2009/xaml"
+             xmlns:local="clr-namespace:R.Paper_Parser.database"
              x:Class="R.Paper_Parser.Pages.HistoryPage"
              Title="Summary History">
 
-    <ScrollView>
-        <StackLayout Padding="20" Spacing="10">
-            <Label Text="Previous Summaries" FontSize="24" HorizontalOptions="Center" />
+    <StackLayout Padding="20" Spacing="10">
+        <Label Text="Previous Summaries" FontSize="24" HorizontalOptions="Center" />
+        
+        <!-- Search functionality for premium users -->
+        <StackLayout x:Name="SearchLayout" IsVisible="False" Orientation="Horizontal">
+            <Entry x:Name="SearchEntry" Placeholder="Search your summaries..." HorizontalOptions="FillAndExpand" />
+            <Button Text="Search" Clicked="OnSearchClicked" />
+        </StackLayout>
+        
+        <!-- Message for basic users -->
+        <Label x:Name="BasicUserLabel" Text="Basic plan users can view their 3 most recent summaries" 
+               TextColor="Gray" FontSize="12" IsVisible="False" HorizontalOptions="Center" />
+               
+        <!-- Empty state message -->
+        <Label x:Name="EmptyStateLabel" Text="No summaries available. Upload a document to generate your first summary." 
+               IsVisible="False" HorizontalOptions="Center" Margin="0,20,0,0" />
+        
+        <ScrollView>
             <CollectionView x:Name="HistoryList">
                 <CollectionView.ItemTemplate>
-                    <DataTemplate>
-                        <Frame BorderColor="Gray" Padding="10" Margin="5">
+                    <DataTemplate x:DataType="local:Summary">
+                        <!-- Replaced Frame with Border -->
+                        <Border Stroke="Gray" StrokeThickness="1" Padding="10" Margin="5">
+                            <Border.GestureRecognizers>
+                                <TapGestureRecognizer Tapped="OnSummaryTapped" />
+                            </Border.GestureRecognizers>
                             <StackLayout>
                                 <Label Text="{Binding FileName}" FontAttributes="Bold"/>
-                                <Label Text="{Binding Timestamp}" FontSize="12"/>
+                                <Label Text="{Binding Timestamp, StringFormat='{0:MM/dd/yyyy hh:mm tt}'}" FontSize="12"/>
                                 <Label Text="{Binding SummaryText}" LineBreakMode="TailTruncation" MaxLines="3"/>
+                                <Label Text="Tap to view full summary" FontSize="10" TextColor="Blue" />
                             </StackLayout>
-                        </Frame>
+                        </Border>
                     </DataTemplate>
                 </CollectionView.ItemTemplate>
             </CollectionView>
-        </StackLayout>
-    </ScrollView>
+        </ScrollView>
+    </StackLayout>
 </ContentPage>
