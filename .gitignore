@@ -1,48 +1,45 @@
+# .NET MAUI specific
+bin/
+obj/
+.vs/
+.vscode/
+*.user
+*.suo
+*.userprefs
+*.lock.json
+*.nuget.props
+*.nuget.targets
+
 # Build results
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+bld/
 [Bb]in/
 [Oo]bj/
 [Ll]og/
-[Ll]ogs/
 
-# Visual Studio cache/options directory
-.vs/
+# Visual Studio for Mac
+.idea/
+*.sln.iml
+
+# macOS specific
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# SQLite database files
+*.db
+*.db3
+*.sqlite
+*.sqlite3
 
 # User-specific files
-*.suo
-*.user
-*.userosscache
-*.sln.docstates
+*.rsuser
+*.swp
 
-# .NET Core
-project.lock.json
-project.fragment.lock.json
-artifacts/
-
-# Files built by Visual Studio
-*_i.c
-*_p.c
-*_h.h
-*.ilk
-*.meta
-*.obj
-*.iobj
-*.pch
-*.pdb
-*.ipdb
-*.pgc
-*.pgd
-*.rsp
-*.sbr
-*.tlb
-*.tli
-*.tlh
-*.tmp
-*.tmp_proj
-*_wpftmp.csproj
-*.log
-*.vspscc
-*.vssscc
-.builds
-*.pidb
-*.svclog
-*.scc
+# Mono Auto Generated Files
+mono_crash.*

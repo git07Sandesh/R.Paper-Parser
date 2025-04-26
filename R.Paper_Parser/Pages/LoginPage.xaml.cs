@@ -1,5 +1,6 @@
 using Microsoft.Maui.Controls;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using R.Paper_Parser.database;
 
@@ -33,12 +34,18 @@ namespace R.Paper_Parser.Pages
                 return;
             }
 
-            bool isLoggedIn = _databaseHelper.LoginUser(email, password);
-            if (isLoggedIn)
+            var user = _databaseHelper.LoginUser(email, password);
+            if (user != null)
             {
                 await DisplayAlert("Success", "Login successful", "OK");
 
-                await Shell.Current.GoToAsync("dashboard");
+                // Pass just the user ID and email as string parameters instead of the whole object
+                var navigationParameter = new Dictionary<string, object>
+                {
+                    { "UserId", user.Id.ToString() },
+                    { "UserEmail", user.Email }
+                };
+                await Shell.Current.GoToAsync("dashboard", navigationParameter);
             }
             else
             {

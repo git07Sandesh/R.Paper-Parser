@@ -7,24 +7,46 @@ using R.Paper_Parser.database;
 
 namespace R.Paper_Parser.Pages
 {
+    [QueryProperty(nameof(UserId), "UserId")]
     public partial class UploadPage : ContentPage
     {
-        private User _currentUser;
+        private int _userId;
+        private User? _currentUser;
         private DatabaseHelper _db;
         private FileResult? _pickedFile;
         private readonly FileUploadService _fileUploadService;
         private readonly SummaryService _summaryService;
 
-        public UploadPage(User user)
+        public string UserId
+        {
+            set
+            {
+                if (int.TryParse(value, out int id))
+                {
+                    _userId = id;
+                    LoadUserData();
+                }
+            }
+        }
+
+        public UploadPage()
         {
             InitializeComponent();
-            _currentUser = user;
             string dbPath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "userdata.db3");
             _db = new DatabaseHelper(dbPath);
             
             // Initialize services
             _fileUploadService = new FileUploadService();
             _summaryService = new SummaryService(_fileUploadService);
+        }
+
+        private void LoadUserData()
+        {
+            if (_userId > 0)
+            {
+                // Get user data from database using the ID
+                _currentUser = _db.GetUserById(_userId);
+            }
         }
 
         private async void OnPickFileClicked(object sender, EventArgs e)
@@ -85,6 +107,12 @@ namespace R.Paper_Parser.Pages
             if (_pickedFile == null)
             {
                 await DisplayAlert("Error", "Please select a file first", "OK");
+                return;
+            }
+
+            if (_currentUser == null)
+            {
+                await DisplayAlert("Error", "User data not loaded. Please try again later.", "OK");
                 return;
             }
 

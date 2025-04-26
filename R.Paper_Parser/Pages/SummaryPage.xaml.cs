@@ -12,6 +12,18 @@ namespace R.Paper_Parser.Pages
         private bool _currentlyShowingSummary = true;
         public bool IsPremium { get; set; }
 
+        // Add parameterless constructor for dependency injection
+        public SummaryPage()
+        {
+            InitializeComponent();
+            BindingContext = this;
+            
+            // Default values
+            _summaryText = "No summary available";
+            SummaryLabel.Text = _summaryText;
+            IsPremium = false;
+        }
+
         public SummaryPage(string summaryText)
         {
             InitializeComponent();
